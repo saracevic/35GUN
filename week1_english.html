@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>35 Günde İngilizce — Hafta 1</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --card: #1a1a26;
+    --border: #2a2a3d;
+    --accent: #7c3aed;
+    --accent2: #06b6d4;
+    --accent3: #f59e0b;
+    --success: #10b981;
+    --text: #e8e8f0;
+    --muted: #6b6b8a;
+    --mono: 'Space Mono', monospace;
+    --sans: 'Syne', sans-serif;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* GRID BG */
+  body::before {
+    content:'';
+    position:fixed;
+    inset:0;
+    background-image:
+      linear-gradient(var(--border) 1px, transparent 1px),
+      linear-gradient(90deg, var(--border) 1px, transparent 1px);
+    background-size: 40px 40px;
+    opacity: 0.3;
+    pointer-events:none;
+    z-index:0;
+  }
+
+  .container { max-width:900px; margin:0 auto; padding:24px 16px; position:relative; z-index:1; }
+
+  /* HEADER */
+  header { text-align:center; padding: 48px 0 40px; }
+  header .tag {
+    display:inline-block;
+    font-family: var(--mono);
+    font-size:11px;
+    letter-spacing:3px;
+    color: var(--accent2);
+    border:1px solid var(--accent2);
+    padding:4px 12px;
+    border-radius:2px;
+    margin-bottom:20px;
+    text-transform:uppercase;
+  }
+  header h1 {
+    font-size: clamp(2rem, 6vw, 3.5rem);
+    font-weight:800;
+    line-height:1.1;
+    letter-spacing:-1px;
+  }
+  header h1 span { color: var(--accent); }
+  header p {
+    margin-top:12px;
+    color: var(--muted);
+    font-size:14px;
+    font-family: var(--mono);
+  }
+
+  /* PROGRESS BAR */
+  .week-progress {
+    background: var(--surface);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:20px 24px;
+    margin-bottom:32px;
+    display:flex;
+    align-items:center;
+    gap:16px;
+    flex-wrap:wrap;
+  }
+  .week-progress span { font-size:13px; color:var(--muted); font-family:var(--mono); white-space:nowrap; }
+  .progress-bar { flex:1; height:6px; background:var(--border); border-radius:3px; min-width:100px; }
+  .progress-fill { height:100%; border-radius:3px; background: linear-gradient(90deg, var(--accent), var(--accent2)); transition:width 0.5s ease; }
+
+  /* DAYS NAV */
+  .days-nav {
+    display:grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap:8px;
+    margin-bottom:32px;
+  }
+  .day-btn {
+    background: var(--surface);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:12px 4px;
+    text-align:center;
+    cursor:pointer;
+    transition: all 0.2s;
+    font-family: var(--mono);
+    position:relative;
+    overflow:hidden;
+  }
+  .day-btn:hover { border-color: var(--accent); transform:translateY(-2px); }
+  .day-btn.active { border-color: var(--accent); background: rgba(124,58,237,0.15); }
+  .day-btn.done { border-color: var(--success); }
+  .day-btn.done::after {
+    content:'✓';
+    position:absolute;
+    top:4px; right:6px;
+    font-size:9px;
+    color: var(--success);
+  }
+  .day-btn .day-num { font-size:18px; font-weight:700; display:block; }
+  .day-btn .day-label { font-size:9px; color:var(--muted); letter-spacing:1px; display:block; margin-top:2px; }
+
+  /* SECTION */
+  .section {
+    background: var(--surface);
+    border:1px solid var(--border);
+    border-radius:12px;
+    margin-bottom:20px;
+    overflow:hidden;
+  }
+  .section-header {
+    padding:18px 24px;
+    display:flex;
+    align-items:center;
+    gap:14px;
+    cursor:pointer;
+    user-select:none;
+    transition: background 0.2s;
+  }
+  .section-header:hover { background: rgba(255,255,255,0.03); }
+  .section-icon {
+    width:36px; height:36px;
+    border-radius:8px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:18px;
+    flex-shrink:0;
+  }
+  .section-header h2 { font-size:16px; font-weight:600; flex:1; }
+  .section-header .chevron { color:var(--muted); transition:transform 0.3s; font-size:12px; }
+  .section-header.open .chevron { transform:rotate(180deg); }
+  .section-body { display:none; padding:0 24px 24px; }
+  .section-body.open { display:block; }
+
+  /* CARDS GRID */
+  .cards-grid {
+    display:grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap:10px;
+    margin-top:16px;
+  }
+  .card {
+    background: var(--card);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:14px;
+    position:relative;
+    transition: border-color 0.2s, transform 0.2s;
+    cursor:pointer;
+  }
+  .card:hover { border-color:var(--accent2); transform:translateY(-1px); }
+  .card .en { font-size:18px; font-weight:700; color:var(--accent2); }
+  .card .tr { font-size:12px; color:var(--muted); margin-top:4px; font-family:var(--mono); }
+  .card .example { font-size:11px; color:var(--text); opacity:0.7; margin-top:8px; border-top:1px solid var(--border); padding-top:8px; line-height:1.5; }
+
+  /* COLOR CARDS */
+  .color-card { display:flex; align-items:center; gap:12px; }
+  .color-swatch { width:36px; height:36px; border-radius:6px; flex-shrink:0; border:2px solid rgba(255,255,255,0.1); }
+
+  /* SENTENCES */
+  .sentence-block {
+    background: var(--card);
+    border-left:3px solid var(--accent);
+    border-radius:0 8px 8px 0;
+    padding:14px 16px;
+    margin-top:10px;
+    font-family: var(--mono);
+    font-size:13px;
+  }
+  .sentence-block .en-s { color:var(--accent2); font-size:15px; font-weight:700; }
+  .sentence-block .tr-s { color:var(--muted); margin-top:4px; font-size:12px; }
+
+  .sentence-set { margin-top:14px; }
+  .sentence-set h4 { font-size:12px; letter-spacing:2px; color:var(--muted); text-transform:uppercase; font-family:var(--mono); margin-bottom:10px; }
+
+  /* QUIZ */
+  .quiz-area { margin-top:20px; }
+  .quiz-q {
+    background: var(--card);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:20px;
+    margin-bottom:12px;
+  }
+  .quiz-q .q-text { font-size:18px; color:var(--accent2); font-weight:700; margin-bottom:16px; }
+  .quiz-options { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .quiz-opt {
+    background: var(--surface);
+    border:1px solid var(--border);
+    border-radius:6px;
+    padding:10px 14px;
+    cursor:pointer;
+    font-family: var(--mono);
+    font-size:13px;
+    transition: all 0.2s;
+    text-align:left;
+    color:var(--text);
+  }
+  .quiz-opt:hover { border-color:var(--accent); background:rgba(124,58,237,0.1); }
+  .quiz-opt.correct { border-color:var(--success); background:rgba(16,185,129,0.15); color:var(--success); }
+  .quiz-opt.wrong { border-color:#ef4444; background:rgba(239,68,68,0.1); color:#ef4444; }
+
+  /* TASK */
+  .task-box {
+    background: rgba(245,158,11,0.08);
+    border:1px solid rgba(245,158,11,0.3);
+    border-radius:8px;
+    padding:18px;
+    margin-top:16px;
+  }
+  .task-box h4 { color:var(--accent3); font-size:12px; letter-spacing:2px; text-transform:uppercase; font-family:var(--mono); margin-bottom:10px; }
+  .task-box p { font-size:14px; color:var(--text); line-height:1.7; }
+  .task-box ul { margin-top:8px; padding-left:0; list-style:none; }
+  .task-box ul li { padding:4px 0; font-size:13px; font-family:var(--mono); color:var(--muted); }
+  .task-box ul li::before { content:'→ '; color:var(--accent3); }
+
+  /* DONE BTN */
+  .done-btn {
+    width:100%;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border:none;
+    border-radius:8px;
+    padding:14px;
+    color:#fff;
+    font-family:var(--sans);
+    font-size:15px;
+    font-weight:700;
+    cursor:pointer;
+    margin-top:20px;
+    transition: opacity 0.2s, transform 0.1s;
+    letter-spacing:1px;
+  }
+  .done-btn:hover { opacity:0.9; transform:translateY(-1px); }
+  .done-btn:active { transform:translateY(0); }
+  .done-btn.completed { background: linear-gradient(135deg, var(--success), #059669); }
+
+  /* RULE BOX */
+  .rule-box {
+    background: rgba(6,182,212,0.08);
+    border:1px solid rgba(6,182,212,0.25);
+    border-radius:8px;
+    padding:16px;
+    margin-top:14px;
+    font-size:13px;
+    line-height:1.7;
+    color:var(--text);
+  }
+  .rule-box strong { color:var(--accent2); }
+
+  /* SVOMPT TABLE */
+  table { width:100%; border-collapse:collapse; margin-top:14px; font-family:var(--mono); font-size:13px; }
+  th { background:var(--card); padding:10px 14px; text-align:left; color:var(--accent); font-size:11px; letter-spacing:2px; }
+  td { padding:10px 14px; border-top:1px solid var(--border); color:var(--muted); }
+  td:first-child { color:var(--text); font-weight:700; }
+  tr:hover td { background:rgba(255,255,255,0.02); }
+
+  .day-content { display:none; }
+  .day-content.active { display:block; animation: fadeIn 0.3s ease; }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+
+  .numbers-grid {
+    display:grid;
+    grid-template-columns: repeat(auto-fill, minmax(90px,1fr));
+    gap:8px;
+    margin-top:14px;
+  }
+  .num-card {
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:12px 8px;
+    text-align:center;
+    font-family:var(--mono);
+  }
+  .num-card .num { font-size:20px; font-weight:700; color:var(--accent); }
+  .num-card .word { font-size:11px; color:var(--muted); margin-top:4px; }
+
+  @media(max-width:600px){
+    .days-nav { grid-template-columns:repeat(7,1fr); gap:4px; }
+    .day-btn { padding:10px 2px; }
+    .day-btn .day-num { font-size:15px; }
+    .cards-grid { grid-template-columns:1fr 1fr; }
+    .quiz-options { grid-template-columns:1fr; }
+    .numbers-grid { grid-template-columns:repeat(4,1fr); }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <div class="tag">35 Günde İngilizce</div>
+    <h1>Hafta <span>1</span></h1>
+    <p>// var olmayı öğren — 7 gün · 7 görev · sıfırdan cümle</p>
+  </header>
+
+  <div class="week-progress">
+    <span>HAFTA İLERLEMESİ</span>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+    <span id="progressText">0 / 7 gün</span>
+  </div>
+
+  <!-- DAYS NAV -->
+  <div class="days-nav" id="daysNav">
+    <div class="day-btn active" onclick="showDay(1)" id="daybtn-1"><span class="day-num">1</span><span class="day-label">Sen Kimsin</span></div>
+    <div class="day-btn" onclick="showDay(2)" id="daybtn-2"><span class="day-num">2</span><span class="day-label">Ne Yapıyorsun</span></div>
+    <div class="day-btn" onclick="showDay(3)" id="daybtn-3"><span class="day-num">3</span><span class="day-label">Etrafın</span></div>
+    <div class="day-btn" onclick="showDay(4)" id="daybtn-4"><span class="day-num">4</span><span class="day-label">Soru Sor</span></div>
+    <div class="day-btn" onclick="showDay(5)" id="daybtn-5"><span class="day-num">5</span><span class="day-label">Var/Yok</span></div>
+    <div class="day-btn" onclick="showDay(6)" id="daybtn-6"><span class="day-num">6</span><span class="day-label">Günün</span></div>
+    <div class="day-btn" onclick="showDay(7)" id="daybtn-7"><span class="day-num">7</span><span class="day-label">Final Test</span></div>
+  </div>
+
+  <!-- =================== GÜN 1 =================== -->
+  <div class="day-content active" id="day-1">
+
+    <div class="section">
+      <div class="section-header open" onclick="toggleSection(this)">
+        <div class="section-icon" style="background:rgba(124,58,237,0.2)">🧑</div>
+        <h2>Tanışma Kalıpları — Tamamı</h2>
+        <span class="chevron">▼</span>
+      </div>
+      <div class="section-body open">
+        <div class="rule-box">
+          <strong>Kural:</strong> İngilizce'de yüklem (fiil) her zaman <strong>2. sıradadır.</strong> Türkçe'de sona gelir, İngilizce'de gelemez.
+          <br><br>
+          <strong>S → V → O → M → P → T</strong> (SVOMPT)
+        </div>
+        <div class="sentence-set">
+          <h4>Kendini Tanıtma</h4>
+          <div class="sentence-block"><div class="en-s">My name is Ali.</div><div class="tr-s">Benim adım Ali.</div></div>
+          <div class="sentence-block"><div class="en-s">I am Ali.</div><div class="tr-s">Ben Ali'yim.</div></div>
+          <div class="sentence-block"><div class="en-s">I'm 27 years old.</div><div class="tr-s">27 yaşındayım. (I'm = I am kısaltması)</div></div>
+          <div class="sentence-block"><div class="en-s">I am from Turkey.</div><div class="tr-s">Türkiye'denim.</div></div>
+          <div class="sentence-block"><div class="en-s">I am from Istanbul.</div><div class="tr-s">İstanbul'danım.</div></div>
+          <div class="sentence-block"><div class="en-s">I live in Istanbul.</div><div class="tr-s">İstanbul'da yaşıyorum.</div></div>
+          <div class="sentence-block"><div class="en-s">I live in Turkey.</div><div class="tr-s">Türkiye'de yaşıyorum.</div></div>
+          <div class="sentence-block"><div class="en-s">Nice to meet you.</div><div class="tr-s">Tanıştığıma memnun oldum.</div></div>
+          <div class="sentence-block"><div class="en-s">How are you?</div><div class="tr-s">Nasılsın?</div></div>
+          <div class="sentence-block"><div class="en-s">I am fine, thank you.</div><div class="tr-s">İyiyim, teşekkür ederim.</div></div>
+          <div class="sentence-block"><div class="en-s">I am not okay.</div><div class="tr-s">İyi değilim. (not = değil)</div></div>
+          <div class="sentence-block"><div class="en-s">I am a student.</div><div class="tr-s">Ben bir öğrenciyim.</div></div>
+          <div class="sentence-block"><div class="en-s">I am a teacher.</div><div class="tr-s">Ben bir öğretmenim.</div></div>
+          <div class="sentence-block"><div class="en-s">I am single.</div><div class="tr-s">Bekarım.</div></div>
+          <div class="sentence-block"><div class="en-s">I am married.</div><div class="tr-s">Evliyim.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-header" onclick="toggleSection(this)">
+        <div class="section-icon" style="background:rgba(6,182,212,0.2)">🔢</div>
+        <h2>Sayılar — 1'den 1000'e Tamamı</h2>
+        <span class="chevron">▼</span>
+      </div>
+      <div class="section-body">
+        <div class="rule-box"><strong>Nasıl çalışır:</strong> 21 → twenty-<strong>one</strong> | 35 → thirty-<strong>five</strong> | 100 → one hundred | 250 → two hundred and fifty</div>
+        <div class="numbers-grid">
+          <div class="num-card"><div class="num">1</div><div class="word">one</div></div>
+          <div class="num-card"><div class="num">2</div><div class="word">two</div></div>
+          <div class="num-card"><div class="num">3</div><div class="word">three</div></div>
+          <div class="num-card"><div class="num">4</div><div class="word">four</div></div>
+          <div class="num-card"><div class="num">5</div><div class="word">five</div></div>
+          <div class="num-card"><div class="num">6</div><div class="word">six</div></div>
+          <div class="num-card"><div class="num">7</div><div class="word">seven</div></div>
+          <div class="num-card"><div class="num">8</div><div class="word">eight</div></div>
+          <div class="num-card"><div class="num">9</div><div class="word">nine</div></div>
+          <div class="num-card"><div class="num">10</div><div class="word">ten</div></div>
+          <div class="num-card"><div class="num">11</div><div class="word">eleven</div></div>
+          <div class="num-card"><div class="num">12</div><div class="word">twelve</div></div>
+          <div class="num-card"><div class="num">13</div><div class="word">thirteen</div></div>
+          <div class="num-card"><div class="num">14</div><div class="word">fourteen</div></div>
+          <div class="num-card"><div class="num">15</div><div class="word">fifteen</div></div>
+          <div class="num-card"><div class="num">16</div><div class="word">sixteen</div></div>
+          <div class="num-card"><div class="num">17</div><div class="word">seventeen</div></div>
+          <div class="num-card"><div class="num">18</div><div class="word">eighteen</div></div>
+          <div class="num-card"><div class="num">19</div><div class="word">nineteen</div></div>
+          <div class="num-card"><div class="num">20</div><div class="word">twenty</div></div>
+          <div class="num-card"><div class="num">21</div><div class="word">twenty-one</div></div>
+          <div class="num-card"><div class="num">30</div><div class="word">thirty</div></div>
+          <div class="num-card"><div class="num">40</div><div class="word">forty</div></div>
+          <div class="num-card"><div class="num">50</div><div class="word">fifty</div></div>
+          <div class="num-card"><div class="num">60</div><div class="word">sixty</div></div>
+          <div class="num-card"><div class="num">70</div><div class="word">seventy</div></div>
+          <div class="num-card"><div class="num">80</div><div class="word">eighty</div></div>
+          <div class="num-card"><div class="num">90</div><div class="word">ninety</div></div>
+          <div class="num-card"><div class="num">100</div><div class="word">hundred</div></div>
+          <div class="num-card"><div class="num">1000</div><div class="word">thousand</div></div>
+        </div>
+        <div class="rule-box" style="margin-top:14px">
+          <strong>Kullanım örnekleri:</strong><br>
+          I am <strong>twenty-seven</strong> years old. → 27 yaşındayım.<br>
+          My phone number is <strong>five, three, two...</strong> → Telefon numaram...<br>
+          There are <strong>one hundred</strong> people. → 100 kişi var.
+        </div>
+      </div>
+    </div>
+
+    <div class="task-box">
+      <h4>🎯 Gün 1 Görevi</h4>
+      <p>Aşağıdaki metni kendi bilgilerinle doldur ve <strong>10 kez sesli</strong> söyle. Notlara bakma, ezberle.</p>
+      <ul>
+        <li>My name is ___.</li>
+        <li>I am ___ years old.</li>
+        <li>I am from Turkey. I live in ___.</li>
+        <li>I am a ___. (student / teacher / engineer vb.)</li>
+        <li>Nice to meet you.</li>
+      </ul>
+    </div>
+    <button class="done-btn" id="doneBtn-1" onclick="markDone(1)">✓ Günü Tamamladım</button>
+  </div>
+
+  <!-- =================== GÜN 2 =================== -->
+  <div class="day-content" id="day-2">
+
+    <div class="section">
+      <div class="section-header open" onclick="toggleSection(this)">
+        <div class="section-icon" style="background:rgba(16,185,129,0.2)">⚡</div>
+        <h2>Temel Fiiller + Cümle Kalıpları — Tamamı</h2>
+        <span class="chevron">▼</span>
+      </div>
+      <div class="section-body open">
+        <div class="rule-box">
+          <strong>Yapı:</strong> I + [fiil] + [ne] + [ne zaman/nerede]<br>
+          <strong>Olumsuz:</strong> I + don't + [fiil] → "I don't eat meat." → Et yemiyorum.<br>
+          <strong>He/She için:</strong> He/She + [fiil+s] → "She works." → O çalışıyor.
+        </div>
+        <div class="cards-grid">
+          <div class="card"><div class="en">work</div><div class="tr">çalışmak</div><div class="example">I work every day.<br>I don't work on Sunday.</div></div>
+          <div class="card"><div class="en">study</div><div class="tr">okumak / çalışmak</div><div class="example">I study English.<br>I study at night.</div></div>
+          <div class="card"><div class="en">eat</div><div class="tr">yemek</div><div class="example">I eat breakfast.<br>I don't eat meat.</div></div>
+          <div class="card"><div class="en">drink</div><div class="tr">içmek</div><div class="example">I drink coffee.<br>I drink water every day.</div></div>
+          <div class="card"><div class="en">sleep</div><div class="tr">uyumak</div><div class="example">I sleep at 11.<br>I don't sleep late.</div></div>
+          <div class="card"><div class="en">wake up</div><div class="tr">uyanmak</div><div class="example">I wake up at 7.<br>I wake up early.</div></div>
+          <div class="card"><div class="en">go</div><div class="tr">gitmek</div><div class="example">I go to work.<br>I go to school.</div></div>
+          <div class="card"><div class="en">come</div><div class="tr">gelmek</div><div class="example">I come home at 6.<br>I come back late.</div></div>
+          <div class="card"><div class="en">watch</div><div class="tr">izlemek</div><div class="example">I watch TV.<br>I watch movies.</div></div>
+          <div class="card"><div class="en">listen</div><div class="tr">dinlemek</div><div class="example">I listen to music.<br>I listen to podcasts.</div></div>
+          <div class="card"><div class="en">read</div><div class="tr">okumak</div><div class="example">I read books.<br>I read every morning.</div></div>
+          <div class="card"><div class="en">write</div><div class="tr">yazmak</div><div class="example">I write notes.<br>I write in English.</div></div>
+          <div class="card"><div class="en">speak</div><div class="tr">konuşmak</div><div class="example">I speak Turkish.<br>I don't speak French.</div></div>
+          <div class="card"><div class="en">love</div><div class="tr">sevmek</div><div class="example">I love music.<br>I love my family.</div></div>
+          <div class="card"><div class="en">like</div><div class="tr">beğenmek</div><div class="example">I like coffee.<br>I don't like rain.</div></div>
+          <div class="card"><div class="en">want</div><div class="tr">istemek</div><div class="example">I want water.<br>I want to learn English.</div></div>
+          <div class="card"><div class="en">need</div><div class="tr">ihtiyaç duymak</div><div class="example">I need help.<br>I need more time.</div></div>
+          <div class="card"><div class="en">know</div><div class="tr">bilmek</div><div class="example">I know this.<br>I don't know.</div></div>
+          <div class="card"><div class="en">think</div><div class="tr">düşünmek</div><div class="example">I think so.<br>I think it's good.</div></div>
+          <div class="card"><div class="en">understand</div><div class="tr">anlamak</div><div class="example">I understand.<br>I don't understand.</div></div>
+        </div>
+
+        <div class="sentence-set">
+          <h4>Zaman İfadeleri — Bunları Cümleye Ekle</h4>
+          <div class="cards-grid">
+            <div class="card"><div class="en">every day</div><div class="tr">her gün</div></div>
+            <div class="card"><div class="en">every morning</div><div class="tr">her sabah</div></div>
+            <div class="card"><div class="en">every night</div><div class="tr">her gece</div></div>
+            <div class="card"><div class="en">in the morning</div><div class="tr">sabahleyin</div></div>
+            <div class="card"><div class="en">at night</div><div class="tr">geceleri</div></div>
+            <div class="card"><div class="en">now</div><div class="tr">şimdi</div></div>
+            <div class="card"><div class="en">today</div><div class="tr">bugün</div></div>
+            <div class="card"><div class="en">sometimes</div><div class="tr">bazen</div></div>
+            <div class="card"><div class="en">always</div><div class="tr">her zaman</div></div>
+            <div class="card"><div class="en">never</div><div class="tr">hiçbir zaman</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="task-box">
+      <h4>🎯 Gün 2 Görevi</h4>
+      <p>Şu 5 cümleyi yaz ve sesli söyle:</p>
+      <ul>
+        <li>I wake up at ___ every day.</li>
+        <li>I drink ___ in the morning.</li>
+        <li>I love ___.</li>
+        <li>I don't like ___.</li>
+        <li>I study English now.</li>
+      </ul>
+    </div>
+    <button class="done-btn" id="doneBtn-2" onclick="markDone(2)">✓ Günü Tamamladım</button>
+  </div>
+
+  <!-- =================== GÜN 3 =================== -->
+  <div class="day-content" id="day-3">
+
+    <div class="section">
+      <div class="section-header open" onclick="toggleSection(this)">
+        <div class="section-icon" style="background:rgba(245,158,11,0.2)">🎨</div>
+        <h2>Renkler — Tamamı + Cümle Kalıpları</h2>
+        <span class="chevron">▼</span>
+      </div>
+      <div class="section-body open">
+        <div class="cards-grid">
+          <div class="card color-card"><div class="color-swatch" style="background:#ef4444"></div><div><div class="en">red</div><div class="tr">kırmızı</div></div></div>
+          <div class="card color-card"><div class="color-swatch" style="background:#3b82f6"></div><div><div class="en">blue</div><div class="tr">mavi</div></div></div>
+          <div class="card color-card"><div class="color-swatch" style="background:#22c55e"></div><div><div class="en">green</div><div class="tr">yeşil</div></div></div>
+          <div class="card color-card"><div class="color-swatch" style="background:#eab308"></div><div><div class="en">yellow</div><div class="tr">sarı</div></div></div>
+          <div class="card color-card"><div class="color-swatch" style="background:#f97316"></div><div><div class="en">orange</div><div class="tr">turuncu</div></div></div>
+          <div class="card color-card"><div class="color-swatch" style="background:#a855f7"></div><div><div class="en">purple</div><div class="tr">mor</div></div></div>
+          <div class="card color-card"><div class="color-swatch" style="background:#ec4899"></div><div><div class="en">pink</div><div class="tr">pembe</div></div></div>
+          <div class="card color-card"><div class="color-swatch" style="background:#1e1e1e; border-color:#555"></div><div><div class="en">black</div><div class="tr">siyah</div></div></div>
+          <div class="card color-card"><div class="color-swatch" style="background:#ffffff"></div><div><div class="en">white</div><div class="tr">beyaz</div></div></div>
+          <div class="card color-card"><div class="color-swatch" style="background:#9ca3af"></div><div><div class="en">grey</div><div class="tr">gri</div></div></div>
+          <div class="card color-card"><div class="color-swatch" style="background:#92400e"></div><div><div class="en">brown</div><div class="tr">kahverengi</div></div></div>
+          <div class="card color-card"><div class="color-swatch" style="background:#06b6d4"></div><div><div class="en">light blue</div><div class="tr">açık mavi</div></div></div>
+          <div class="card color-card"><div class="color-swatch" style="background:#1d4ed8"></div><div><div class="en">dark blue</div><div class="tr">koyu mavi</div></div></div>
+          <div class="card color-card"><div class="color-swatch" style="background:#fde68a"></div><div><div class="en">light yellow</div><div class="tr">açık sarı</div></div></div>
+          <div class="card color-card"><div class="color-swatch" style="background:#fda4af"></div><div><div class="en">light pink</div><div class="tr">açık pembe</div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-header" onclick="toggleSection(this)">
+        <div class="section-icon" style="background:rgba(124,58,237,0.2)">🏠</div>
+        <h2>This is / That is / There is — Kalıpları</h2>
+        <span class="chevron">▼</span>
+      </div>
+      <div class="section-body">
+        <div class="rule-box">
+          <strong>This is</strong> → Yakındaki şey → "Bu bir sandalye."<br>
+          <strong>That is</strong> → Uzaktaki şey → "Şu bir araba."<br>
+          <strong>There is</strong> → Bir yerde var → "Odamda bir masa var."<br>
+          <strong>There are</strong> → Birden fazla → "Odamda iki sandalye var."
+        </div>
+        <div class="sentence-set">
+          <h4>Renk + Nesne Kalıpları</h4>
+          <div class="sentence-block"><div class="en-s">This is a red chair.</div><div class="tr-s">Bu kırmızı bir sandalye.</div></div>
+          <div class="sentence-block"><div class="en-s">That is a black phone.</div><div class="tr-s">Şu siyah bir telefon.</div></div>
+          <div class="sentence-block"><div class="en-s">There is a white wall.</div><div class="tr-s">Beyaz bir duvar var.</div></div>
+          <div class="sentence-block"><div class="en-s">There are two blue cups.</div><div class="tr-s">İki mavi fincan var.</div></div>
+          <div class="sentence-block"><div class="en-s">My bag is black.</div><div class="tr-s">Çantam siyah.</div></div>
+          <div class="sentence-block"><div class="en-s">My phone is grey.</div><div class="tr-s">Telefonum gri.</div></div>
+          <div class="sentence-block"><div class="en-s">The sky is blue.</div><div class="tr-s">Gökyüzü mavi.</div></div>
+          <div class="sentence-block"><div class="en-s">This is not red. It is orange.</div><div class="tr-s">Bu kırmızı değil. O turuncu.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="task-box">
+      <h4>🎯 Gün 3 Görevi — Evde Yap</h4>
+      <p>Evinde 10 eşyaya bak ve her biri için sesli söyle:</p>
+      <ul>
+        <li>This is a [renk] [eşya].</li>
+        <li>My [eşya] is [renk].</li>
+        <li>There is a [renk] [eşya] in my room.</li>
+      </ul>
+    </div>
+    <button class="done-btn" id="doneBtn-3" onclick="markDone(3)">✓ Günü Tamamladım</button>
+  </div>
+
+  <!-- =================== GÜN 4 =================== -->
+  <div class="day-content" id="day-4">
+
+    <div class="section">
+      <div class="section-header open" onclick="toggleSection(this)">
+        <div class="section-icon" style="background:rgba(6,182,212,0.2)">❓</div>
+        <h2>Soru Kelimeleri + Soru Kalıpları — Tamamı</h2>
+        <span class="chevron">▼</span>
+      </div>
+      <div class="section-body open">
+        <div class="cards-grid">
+          <div class="card"><div class="en">What?</div><div class="tr">Ne? / Hangi?</div><div class="example">What is your name?<br>What do you want?</div></div>
+          <div class="card"><div class="en">Where?</div><div class="tr">Nerede? / Nereye?</div><div class="example">Where are you from?<br>Where do you live?</div></div>
+          <div class="card"><div class="en">Who?</div><div class="tr">Kim?</div><div class="example">Who is this?<br>Who are you?</div></div>
+          <div class="card"><div class="en">When?</div><div class="tr">Ne zaman?</div><div class="example">When do you sleep?<br>When is your birthday?</div></div>
+          <div class="card"><div class="en">Why?</div><div class="tr">Neden? / Niye?</div><div class="example">Why are you here?<br>Why do you study?</div></div>
+          <div class="card"><div class="en">How?</div><div class="tr">Nasıl?</div><div class="example">How are you?<br>How do you go?</div></div>
+          <div class="card"><div class="en">How old?</div><div class="tr">Kaç yaşında?</div><div class="example">How old are you?<br>How old is she?</div></div>
+          <div class="card"><div class="en">How many?</div><div class="tr">Kaç tane?</div><div class="example">How many people?<br>How many days?</div></div>
+          <div class="card"><div class="en">Which?</div><div class="tr">Hangi?</div><div class="example">Which one?<br>Which color?</div></div>
+          <div class="card"><div class="en">Whose?</div><div class="tr">Kimin?</div><div class="example">Whose bag is this?<br>Whose phone?</div></div>
+        </div>
+
+        <div class="sentence-set">
+          <h4>Are you...? / Do you...? Kalıpları</h4>
+          <div class="sentence-block"><div class="en-s">Are you okay?</div><div class="tr-s">Tamam mısın? / İyi misin?</div></div>
+          <div class="sentence-block"><div class="en-s">Are you from Turkey?</div><div class="tr-s">Türkiye'den misin?</div></div>
+          <div class="sentence-block"><div class="en-s">Are you a student?</div><div class="tr-s">Öğrenci misin?</div></div>
+          <div class="sentence-block"><div class="en-s">Do you speak English?</div><div class="tr-s">İngilizce konuşuyor musun?</div></div>
+          <div class="sentence-block"><div class="en-s">Do you like coffee?</div><div class="tr-s">Kahve sever misin?</div></div>
+          <div class="sentence-block"><div class="en-s">Do you have a phone?</div><div class="tr-s">Telefonun var mı?</div></div>
+          <div class="sentence-block"><div class="en-s">Do you work here?</div><div class="tr-s">Burada çalışıyor musun?</div></div>
+        </div>
+
+        <div class="rule-box" style="margin-top:16px">
+          <strong>Kural — Are you vs Do you:</strong><br>
+          <strong>Are you</strong> → "misin?" → Are you happy? (Mutlu musun?)<br>
+          <strong>Do you</strong> → "...yapar mısın?" → Do you work? (Çalışır mısın?)
+        </div>
+      </div>
+    </div>
+
+    <div class="task-box">
+      <h4>🎯 Gün 4 Görevi — Aynaya Bak</h4>
+      <p>Aynaya bak. Aşağıdaki soruları sor, sonra cevapla. Kendi kendine röportaj:</p>
+      <ul>
+        <li>What is your name? — My name is ___.</li>
+        <li>Where are you from? — I am from ___.</li>
+        <li>How old are you? — I am ___ years old.</li>
+        <li>Do you speak English? — Yes, a little. / No, not yet.</li>
+        <li>Are you okay? — Yes, I am fine.</li>
+      </ul>
+    </div>
+    <button class="done-btn" id="doneBtn-4" onclick="markDone(4)">✓ Günü Tamamladım</button>
+  </div>
+
+  <!-- =================== GÜN 5 =================== -->
+  <div class="day-content" id="day-5">
+
+    <div class="section">
+      <div class="section-header open" onclick="toggleSection(this)">
+        <div class="section-icon" style="background:rgba(16,185,129,0.2)">✅</div>
+        <h2>I have / I don't have — Var/Yok Kalıpları</h2>
+        <span class="chevron">▼</span>
+      </div>
+      <div class="section-body open">
+        <div class="rule-box">
+          <strong>I have</strong> → ...var (bende)<br>
+          <strong>I don't have</strong> → ...yok (bende)<br>
+          <strong>There is</strong> → ...var (bir yerde)<br>
+          <strong>There isn't</strong> → ...yok (bir yerde)<br>
+          <strong>There are</strong> → ...var (birden fazla şey)
+        </div>
+
+        <div class="sentence-set">
+          <h4>I have / I don't have</h4>
+          <div class="sentence-block"><div class="en-s">I have a phone.</div><div class="tr-s">Telefonum var.</div></div>
+          <div class="sentence-block"><div class="en-s">I have a car.</div><div class="tr-s">Arabam var.</div></div>
+          <div class="sentence-block"><div class="en-s">I don't have a car.</div><div class="tr-s">Arabam yok.</div></div>
+          <div class="sentence-block"><div class="en-s">I have a sister.</div><div class="tr-s">Kız kardeşim var.</div></div>
+          <div class="sentence-block"><div class="en-s">I don't have a brother.</div><div class="tr-s">Erkek kardeşim yok.</div></div>
+          <div class="sentence-block"><div class="en-s">I have time.</div><div class="tr-s">Zamanım var.</div></div>
+          <div class="sentence-block"><div class="en-s">I don't have time.</div><div class="tr-s">Zamanım yok.</div></div>
+          <div class="sentence-block"><div class="en-s">I have a question.</div><div class="tr-s">Bir sorum var.</div></div>
+          <div class="sentence-block"><div class="en-s">I have a problem.</div><div class="tr-s">Bir problemim var.</div></div>
+          <div class="sentence-block"><div class="en-s">I don't have money.</div><div class="tr-s">Param yok.</div></div>
+        </div>
+
+        <div class="sentence-set">
+          <h4>There is / There are</h4>
+          <div class="sentence-block"><div class="en-s">There is a table in my room.</div><div class="tr-s">Odamda bir masa var.</div></div>
+          <div class="sentence-block"><div class="en-s">There isn't a dog in my house.</div><div class="tr-s">Evimde köpek yok.</div></div>
+          <div class="sentence-block"><div class="en-s">There are two chairs in the kitchen.</div><div class="tr-s">Mutfakta iki sandalye var.</div></div>
+          <div class="sentence-block"><div class="en-s">There is no milk.</div><div class="tr-s">Süt yok.</div></div>
+          <div class="sentence-block"><div class="en-s">Is there a bathroom?</div><div class="tr-s">Banyo var mı?</div></div>
+          <div class="sentence-block"><div class="en-s">Are there any shops here?</div><div class="tr-s">Burada dükkânlar var mı?</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="task-box">
+      <h4>🎯 Gün 5 Görevi</h4>
+      <p>Evini düşün, 8 cümle kur:</p>
+      <ul>
+        <li>I have a ___.</li>
+        <li>I don't have a ___.</li>
+        <li>There is a ___ in my ___.</li>
+        <li>There are ___ chairs in my ___.</li>
+      </ul>
+    </div>
+    <button class="done-btn" id="doneBtn-5" onclick="markDone(5)">✓ Günü Tamamladım</button>
+  </div>
+
+  <!-- =================== GÜN 6 =================== -->
+  <div class="day-content" id="day-6">
+
+    <div class="section">
+      <div class="section-header open" onclick="toggleSection(this)">
+        <div class="section-icon" style="background:rgba(245,158,11,0.2)">☀️</div>
+        <h2>Günlük Rutin — Tam Cümle Seti</h2>
+        <span class="chevron">▼</span>
+      </div>
+      <div class="section-body open">
+        <div class="rule-box">
+          <strong>Saat söylemek:</strong><br>
+          It is 7 o'clock. → Saat 7.<br>
+          at 7 → 7'de | at 7:30 → 7:30'da | at noon → öğleyin | at midnight → geceyarısı
+        </div>
+        <div class="sentence-set">
+          <h4>Sabah</h4>
+          <div class="sentence-block"><div class="en-s">I wake up at 7 o'clock.</div><div class="tr-s">Saat 7'de uyanırım.</div></div>
+          <div class="sentence-block"><div class="en-s">I brush my teeth in the morning.</div><div class="tr-s">Sabah dişlerimi fırçalarım.</div></div>
+          <div class="sentence-block"><div class="en-s">I take a shower every morning.</div><div class="tr-s">Her sabah duş alırım.</div></div>
+          <div class="sentence-block"><div class="en-s">I eat breakfast at 8.</div><div class="tr-s">Saat 8'de kahvaltı yaparım.</div></div>
+          <div class="sentence-block"><div class="en-s">I drink coffee in the morning.</div><div class="tr-s">Sabahları kahve içerim.</div></div>
+        </div>
+        <div class="sentence-set">
+          <h4>Öğle & Akşam</h4>
+          <div class="sentence-block"><div class="en-s">I go to work at 9.</div><div class="tr-s">Saat 9'da işe giderim.</div></div>
+          <div class="sentence-block"><div class="en-s">I eat lunch at noon.</div><div class="tr-s">Öğleyin öğle yemeği yerim.</div></div>
+          <div class="sentence-block"><div class="en-s">I come back home at 6.</div><div class="tr-s">Saat 6'da eve dönerim.</div></div>
+          <div class="sentence-block"><div class="en-s">I cook dinner at 7.</div><div class="tr-s">Saat 7'de akşam yemeği pişiririm.</div></div>
+          <div class="sentence-block"><div class="en-s">I watch TV in the evening.</div><div class="tr-s">Akşamları TV izlerim.</div></div>
+          <div class="sentence-block"><div class="en-s">I study English every night.</div><div class="tr-s">Her gece İngilizce çalışırım.</div></div>
+          <div class="sentence-block"><div class="en-s">I go to bed at 11.</div><div class="tr-s">Saat 11'de yatarım.</div></div>
+          <div class="sentence-block"><div class="en-s">I sleep for 8 hours.</div><div class="tr-s">8 saat uyurum.</div></div>
+        </div>
+
+        <div class="sentence-set">
+          <h4>SVOMPT Tablosu — Bugünün Cümlelerini Parçala</h4>
+          <table>
+            <tr><th>S</th><th>V</th><th>O</th><th>M</th><th>P</th><th>T</th></tr>
+            <tr><td>I</td><td>eat</td><td>breakfast</td><td>—</td><td>—</td><td>at 8</td></tr>
+            <tr><td>I</td><td>go</td><td>—</td><td>—</td><td>to work</td><td>at 9</td></tr>
+            <tr><td>I</td><td>study</td><td>English</td><td>carefully</td><td>at home</td><td>every night</td></tr>
+            <tr><td>I</td><td>drink</td><td>coffee</td><td>—</td><td>—</td><td>in the morning</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="task-box">
+      <h4>🎯 Gün 6 Görevi — Bugünün Günlüğü</h4>
+      <p>Bugün yaşadığın günü <strong>8 cümleyle</strong> anlat. Sabahtan geceye kadar. Yaz ve sesli oku.</p>
+      <ul>
+        <li>I woke up at ___.</li>
+        <li>I ate ___ for breakfast.</li>
+        <li>I went to ___.</li>
+        <li>I came home at ___.</li>
+        <li>I watched / listened to ___.</li>
+        <li>I studied English today.</li>
+      </ul>
+    </div>
+    <button class="done-btn" id="doneBtn-6" onclick="markDone(6)">✓ Günü Tamamladım</button>
+  </div>
+
+  <!-- =================== GÜN 7 =================== -->
+  <div class="day-content" id="day-7">
+
+    <div class="section">
+      <div class="section-header open" onclick="toggleSection(this)">
+        <div class="section-icon" style="background:rgba(124,58,237,0.2)">🏆</div>
+        <h2>Hafta 1 — Final Testi</h2>
+        <span class="chevron">▼</span>
+      </div>
+      <div class="section-body open">
+        <div class="rule-box">
+          Bu test notlara <strong>BAKMA.</strong> Başarırsan hafta 1 bitti. Başaramazsan geri dön, tekrar et.
+        </div>
+
+        <div class="quiz-area" id="quizArea"></div>
+        <div id="quizResult" style="display:none; margin-top:20px; padding:20px; border-radius:8px; text-align:center; font-family:var(--mono); font-size:16px;"></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-header" onclick="toggleSection(this)">
+        <div class="section-icon" style="background:rgba(16,185,129,0.2)">🎤</div>
+        <h2>Sesli Final — Bunu Ezbere Söyle</h2>
+        <span class="chevron">▼</span>
+      </div>
+      <div class="section-body">
+        <div class="rule-box">Aşağıdaki paragrafı <strong>nota bakmadan</strong> sesli söyle. Bu senin hafta 1 bitiş sınavın.</div>
+        <div class="sentence-block" style="margin-top:12px; border-left-color:var(--success)">
+          <div class="en-s" style="font-size:14px; line-height:1.8">
+            Hello! My name is ___. I am ___ years old. I am from Turkey. I live in ___.<br>
+            I wake up at ___ every day. I eat breakfast in the morning. I drink coffee.<br>
+            I go to work / school at ___. I come back home at ___.<br>
+            I have a phone. I don't have a ___.<br>
+            There is a table in my room. The table is ___. (renk)<br>
+            I love ___. I don't like ___.<br>
+            I study English every day. Nice to meet you!
+          </div>
+          <div class="tr-s" style="margin-top:10px">Boşlukları kendi bilgilerinle doldur ve nota BAKMA.</div>
+        </div>
+      </div>
+    </div>
+
+    <button class="done-btn" id="doneBtn-7" onclick="markDone(7)">🏆 Hafta 1 Tamamlandı!</button>
+  </div>
+
+</div>
+
+<script>
+const days = [1,2,3,4,5,6,7];
+const completedDays = JSON.parse(localStorage.getItem('eng_week1_done') || '[]');
+
+function init() {
+  completedDays.forEach(d => {
+    const btn = document.getElementById('daybtn-' + d);
+    if(btn) btn.classList.add('done');
+    const doneBtn = document.getElementById('doneBtn-' + d);
+    if(doneBtn) { doneBtn.textContent = '✓ Tamamlandı'; doneBtn.classList.add('completed'); }
+  });
+  updateProgress();
+  buildQuiz();
+}
+
+function showDay(n) {
+  document.querySelectorAll('.day-content').forEach(d => d.classList.remove('active'));
+  document.querySelectorAll('.day-btn').forEach(d => d.classList.remove('active'));
+  document.getElementById('day-' + n).classList.add('active');
+  document.getElementById('daybtn-' + n).classList.add('active');
+}
+
+function toggleSection(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+
+function markDone(day) {
+  if(!completedDays.includes(day)) {
+    completedDays.push(day);
+    localStorage.setItem('eng_week1_done', JSON.stringify(completedDays));
+  }
+  const btn = document.getElementById('daybtn-' + day);
+  if(btn) btn.classList.add('done');
+  const doneBtn = document.getElementById('doneBtn-' + day);
+  if(doneBtn) { doneBtn.textContent = day === 7 ? '🏆 Tamamlandı!' : '✓ Tamamlandı'; doneBtn.classList.add('completed'); }
+  updateProgress();
+  if(day < 7) setTimeout(() => showDay(day + 1), 400);
+}
+
+function updateProgress() {
+  const pct = (completedDays.length / 7) * 100;
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressText').textContent = completedDays.length + ' / 7 gün';
+}
+
+// QUIZ
+const quizData = [
+  { q: '"Benim adım Ali." → ?', opts: ['My name is Ali.','I am from Ali.','Name is Ali my.','Ali name my is.'], ans: 0 },
+  { q: '"27 yaşındayım." → ?', opts: ['I have 27 years.','I am 27 years old.','My age is have 27.','Years old I am 27.'], ans: 1 },
+  { q: '"Kahve içmiyorum." → ?', opts: ["I don't drink coffee.",'I not drink coffee.','I drink not coffee.','No drink coffee I.'], ans: 0 },
+  { q: '"Neredesin?" → ?', opts: ['Who are you?','Where are you?','What are you?','When are you?'], ans: 1 },
+  { q: '"Arabam yok." → ?', opts: ["I don't have a car.",'There is no car me.','I have not car.','Car not mine.'], ans: 0 },
+  { q: '"Mavi bir sandalye var." → ?', opts: ['This is blue chair a.','There is a blue chair.','A chair blue there.','Blue chair is there a.'], ans: 1 },
+  { q: '"Kaç yaşındasın?" → ?', opts: ['How are you old?','What old are you?','How old are you?','Who old are you?'], ans: 2 },
+  { q: 'SVOMPT sırasına göre doğru cümle hangisi?', opts: ['I at home study English every day.','I study English at home every day.','English I study at home every day.','Every day I at home English study.'], ans: 1 },
+];
+
+let answered = 0;
+let correct = 0;
+
+function buildQuiz() {
+  const area = document.getElementById('quizArea');
+  if(!area) return;
+  area.innerHTML = '';
+  quizData.forEach((q, qi) => {
+    const div = document.createElement('div');
+    div.className = 'quiz-q';
+    div.innerHTML = `<div class="q-text">${qi+1}. ${q.q}</div>
+      <div class="quiz-options">
+        ${q.opts.map((o,oi) => `<button class="quiz-opt" onclick="answer(this,${qi},${oi})">${o}</button>`).join('')}
+      </div>`;
+    area.appendChild(div);
+  });
+}
+
+function answer(btn, qi, chosen) {
+  const q = quizData[qi];
+  const opts = btn.closest('.quiz-options').querySelectorAll('.quiz-opt');
+  opts.forEach(o => o.disabled = true);
+  if(chosen === q.ans) { btn.classList.add('correct'); correct++; }
+  else { btn.classList.add('wrong'); opts[q.ans].classList.add('correct'); }
+  answered++;
+  if(answered === quizData.length) showResult();
+}
+
+function showResult() {
+  const res = document.getElementById('quizResult');
+  const pct = Math.round((correct / quizData.length) * 100);
+  res.style.display = 'block';
+  if(pct >= 75) {
+    res.style.background = 'rgba(16,185,129,0.15)';
+    res.style.border = '1px solid var(--success)';
+    res.style.color = 'var(--success)';
+    res.innerHTML = `✓ ${correct}/${quizData.length} doğru (${pct}%) — Hafta 1 geçildi! Sesli finali de yap.`;
+  } else {
+    res.style.background = 'rgba(239,68,68,0.1)';
+    res.style.border = '1px solid #ef4444';
+    res.style.color = '#ef4444';
+    res.innerHTML = `✗ ${correct}/${quizData.length} doğru (${pct}%) — Geri dön, gün 1-6'yı tekrar et. Sonra gel.`;
+  }
+}
+
+init();
+</script>
+</body>
+</html>
